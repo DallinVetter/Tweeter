@@ -30,15 +30,17 @@ import java.util.concurrent.Executors;
 import edu.byu.cs.client.R;
 import edu.byu.cs.tweeter.client.backgroundTask.GetFollowersTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetUserTask;
+import edu.byu.cs.tweeter.client.backgroundTask.PagedUserTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.presenter.FollowerPresenter;
+import edu.byu.cs.tweeter.client.presenter.PagedPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.model.domain.User;
 
 /**
  * Implements the "Followers" tab.
  */
-public class FollowersFragment extends Fragment implements FollowerPresenter.View {
+public class FollowersFragment extends Fragment implements PagedPresenter.PagedView<User> {
 
     private static final String LOG_TAG = "FollowersFragment";
     private static final String USER_KEY = "UserKey";
@@ -107,15 +109,15 @@ public class FollowersFragment extends Fragment implements FollowerPresenter.Vie
     }
 
     @Override
-    public void addFollowers(List<User> followers) {
-        followersRecyclerViewAdapter.addItems(followers);
-    }
-
-    @Override
     public void displayUser(User user) {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.putExtra(MainActivity.CURRENT_USER_KEY, user);
         startActivity(intent);
+    }
+
+    @Override
+    public void addItems(List items) {
+        followersRecyclerViewAdapter.addItems(items);
     }
 
     /**
@@ -142,6 +144,7 @@ public class FollowersFragment extends Fragment implements FollowerPresenter.Vie
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+//                    presenter.getUser(Cache.getInstance().getCurrUserAuthToken(), userAlias.getText().toString());
                     presenter.getUser(Cache.getInstance().getCurrUserAuthToken(), userAlias.getText().toString());
 //                    GetUserTask getUserTask = new GetUserTask(Cache.getInstance().getCurrUserAuthToken(),
 //                            userAlias.getText().toString(), new GetUserHandler());

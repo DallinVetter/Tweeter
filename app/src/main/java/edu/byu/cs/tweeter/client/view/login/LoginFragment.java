@@ -2,8 +2,6 @@ package edu.byu.cs.tweeter.client.view.login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,24 +10,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import edu.byu.cs.client.R;
-import edu.byu.cs.tweeter.client.backgroundTask.LoginTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.presenter.AuthenticationPresenter;
 import edu.byu.cs.tweeter.client.presenter.LoginPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
-import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
 /**
  * Implements the login screen.
  */
-public class LoginFragment extends Fragment implements LoginPresenter.View {
+public class LoginFragment extends Fragment implements AuthenticationPresenter.AuthenticationView {
     private static final String LOG_TAG = "LoginFragment";
     private LoginPresenter presenter;
     private Toast loginInToast;
@@ -64,20 +57,13 @@ public class LoginFragment extends Fragment implements LoginPresenter.View {
             public void onClick(View view) {
                 // Login and move to MainActivity.
                 try {
-//                    validateLogin();
-                    presenter.validateLogin(alias.getText().toString(), password.getText().toString());
+                    presenter.validateUser(alias.getText().toString(), password.getText().toString());
                     errorView.setText(null);
 
                     loginInToast = Toast.makeText(getContext(), "Logging In...", Toast.LENGTH_LONG);
                     loginInToast.show();
 
-                    // Send the login request.
-                    presenter.loginTask(alias.getText().toString(), password.getText().toString());
-//                    LoginTask loginTask = new LoginTask(alias.getText().toString(),
-//                            password.getText().toString(),
-//                            new LoginHandler());
-//                    ExecutorService executor = Executors.newSingleThreadExecutor();
-//                    executor.execute(loginTask);
+                    presenter.authenticate(alias.getText().toString(), password.getText().toString());
                 } catch (Exception e) {
                     errorView.setText(e.getMessage());
                 }
@@ -89,18 +75,37 @@ public class LoginFragment extends Fragment implements LoginPresenter.View {
 
     @Override
     public void displayMessage(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+        clearInfoMessage();
+        loginInToast = Toast.makeText(getContext(), message, Toast.LENGTH_LONG);
+        loginInToast.show();
     }
 
     @Override
-    public void handleLogin(User loggedInUser) {
+    public void displayErrorMessage(String message) {
+        errorView.setText(message);
+    }
+
+    @Override
+    public void clearErrorMessage() {
+        errorView.setText("");
+    }
+
+    @Override
+    public void clearInfoMessage() {
+        if (loginInToast != null) {
+            loginInToast.cancel();
+            loginInToast = null;
+        }
+    }
+
+    @Override
+    public void navigateToUser(User user) {
         Intent intent = new Intent(getContext(), MainActivity.class);
-        intent.putExtra(MainActivity.CURRENT_USER_KEY, loggedInUser);
+        intent.putExtra(MainActivity.CURRENT_USER_KEY, user);
 
         loginInToast.cancel();
 
         Toast.makeText(getContext(), "Hello " + Cache.getInstance().getCurrUser().getName(), Toast.LENGTH_LONG).show();
         startActivity(intent);
     }
-
 }

@@ -1,52 +1,48 @@
 package edu.byu.cs.tweeter.client.presenter;
 
-import android.text.Editable;
+import edu.byu.cs.tweeter.client.backgroundTask.observer.AuthenticationObserver;
 
-import java.security.Provider;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+public class LoginPresenter extends AuthenticationPresenter {
+    AuthenticationView view;
 
-import edu.byu.cs.tweeter.client.backgroundTask.LoginTask;
-import edu.byu.cs.tweeter.client.model.service.UserService;
-import edu.byu.cs.tweeter.client.view.login.LoginFragment;
-import edu.byu.cs.tweeter.model.domain.User;
-
-public class LoginPresenter {
-    UserService service;
-    private View view;
-    public LoginPresenter(View view) {
+    public LoginPresenter(AuthenticationView view) {
+        super(view);
         this.view = view;
-        service = new UserService();
     }
 
-    public interface View {
-        void displayMessage(String message);
-
-        void handleLogin(User loggedInUser);
-    }
-    public void loginTask(String alias, String password) {
-        LoginObserver observer = new LoginObserver();
-        service.loginTask(alias, password, observer);
-    }
-    public void validateLogin(String alias, String password) {
-        service.validateLogin(alias, password);
-    }
-
-    private class LoginObserver implements UserService.LoginObserver {
-
-        @Override
-        public void handleLogin(User loggedInUser) {
-            view.handleLogin(loggedInUser);
+    @Override
+    protected String getDescription(boolean errOrEx) {
+        if(errOrEx){
+            return "Failed to login: ";
         }
-
-        @Override
-        public void displayErrorMessage(String message) {
-            view.displayMessage("Failed to get followers: " + message);
-        }
-
-        @Override
-        public void displayException(Exception ex) {
-            view.displayMessage("Failed to login because of exception: " + ex.getMessage());
+        else{
+            return "Failed to get login because of exception: ";
         }
     }
+
+    @Override
+    public String validateUser(String alias, String password) {
+        if (alias.charAt(0) != '@') {
+            return "Alias must begin with @.";
+        }
+        if (alias.length() < 2) {
+            return "Alias must contain 1 or more characters after the @.";
+        }
+        if (password.length() == 0) {
+            return "Password cannot be empty.";
+        }
+        return null;
+    }
+
+    @Override
+    protected String getAction() {
+        return "Logging In...";
+    }
+
+    @Override
+    protected void run(String alias, String password, AuthenticationObserver observer) {
+//        userService.authenticate(alias, password, observer);
+        userService.loginTask(alias, password, observer);
+    }
+
 }

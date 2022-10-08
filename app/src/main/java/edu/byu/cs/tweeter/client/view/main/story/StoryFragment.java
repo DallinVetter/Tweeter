@@ -37,6 +37,7 @@ import edu.byu.cs.client.R;
 import edu.byu.cs.tweeter.client.backgroundTask.GetStoryTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetUserTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.presenter.PagedPresenter;
 import edu.byu.cs.tweeter.client.presenter.StoryPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.model.domain.Status;
@@ -45,7 +46,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the "Story" tab.
  */
-public class StoryFragment extends Fragment implements StoryPresenter.View{
+public class StoryFragment extends Fragment implements PagedPresenter.PagedView<Status> {
     private static final String LOG_TAG = "StoryFragment";
     private static final String USER_KEY = "UserKey";
 
@@ -113,15 +114,15 @@ public class StoryFragment extends Fragment implements StoryPresenter.View{
     }
 
     @Override
-    public void handleStory(List<Status> feed) {
-        storyRecyclerViewAdapter.addItems(feed);
-    }
-
-    @Override
     public void displayUser(User user) {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.putExtra(MainActivity.CURRENT_USER_KEY, user);
         startActivity(intent);
+    }
+
+    @Override
+    public void addItems(List items) {
+        storyRecyclerViewAdapter.addItems(items);
     }
 
     /**
@@ -152,6 +153,7 @@ public class StoryFragment extends Fragment implements StoryPresenter.View{
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+//                    presenter.getUser(Cache.getInstance().getCurrUserAuthToken(), userAlias.getText().toString());
                     presenter.getUser(Cache.getInstance().getCurrUserAuthToken(), userAlias.getText().toString());
 //                    GetUserTask getUserTask = new GetUserTask(Cache.getInstance().getCurrUserAuthToken(),
 //                            userAlias.getText().toString(), new GetUserHandler());
@@ -193,6 +195,7 @@ public class StoryFragment extends Fragment implements StoryPresenter.View{
                             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(clickable));
                             startActivity(intent);
                         } else {
+//                            presenter.getUser(Cache.getInstance().getCurrUserAuthToken(), clickable);
                             presenter.getUser(Cache.getInstance().getCurrUserAuthToken(), clickable);
 //                            GetUserTask getUserTask = new GetUserTask(Cache.getInstance().getCurrUserAuthToken(),
 //                                    clickable, new GetUserHandler());

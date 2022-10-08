@@ -1,47 +1,76 @@
 package edu.byu.cs.tweeter.client.presenter;
 
+import android.widget.ImageView;
+
+import edu.byu.cs.tweeter.client.backgroundTask.observer.AuthenticationObserver;
 import edu.byu.cs.tweeter.client.model.service.UserService;
+import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class RegisterPresenter {
-    UserService service;
-    private View view;
+public class RegisterPresenter extends AuthenticationPresenter {
+    AuthenticationView view;
+    String firstName;
+    String lastName;
+    String imageStringToUpload;
 
-    public RegisterPresenter(View view) {
+    public RegisterPresenter(AuthenticationView view) {
+        super(view);
         this.view = view;
-        service = new UserService();
     }
 
-    public void registerTask(String firstName, String lastName, String alias, String password, String imageBytesBase64) {
-        RegisterObserver observer = new RegisterObserver();
-        service.registerTask(firstName, lastName, alias, password, imageBytesBase64, observer);
-    }
-
-    public void validateRegistration(String firstName, String lastName, String alias, String password, String imageBytesBase64) {
-        service.validateRegistration(firstName, lastName, alias, password, imageBytesBase64);
-    }
-
-    public interface View {
-        void displayMessage(String message);
-
-        void handleRegister(User registeredUser);
-    }
-
-    private class RegisterObserver implements UserService.RegisterObserver {
-
-        @Override
-        public void handleRegister(User registeredUser) {
-            view.handleRegister(registeredUser);
+    @Override
+    protected String getDescription(boolean errOrEx) {
+        if(errOrEx){
+            return "Failed to register: ";
         }
-
-        @Override
-        public void displayErrorMessage(String message) {
-            view.displayMessage("Failed to register: " + message);
-        }
-
-        @Override
-        public void displayException(Exception ex) {
-            view.displayMessage("Failed to register because of exception: " + ex.getMessage());
+        else{
+            return "Failed to get register because of exception: ";
         }
     }
+
+    @Override
+    public String validateUser(String alias, String password) {
+        if (firstName.length() == 0) {
+            return "First Name cannot be empty.";
+        }
+        if (lastName.length() == 0) {
+            return "Last Name cannot be empty.";
+        }
+        if (alias.length() == 0) {
+            return "Alias cannot be empty.";
+        }
+        if (alias.charAt(0) != '@') {
+            return "Alias must begin with @.";
+        }
+        if (alias.length() < 2) {
+            return "Alias must contain 1 or more characters after the @.";
+        }
+        if (password.length() == 0) {
+            return "Password cannot be empty.";
+        }
+
+        if (imageStringToUpload == "") {
+            throw new IllegalArgumentException("Profile image must be uploaded.");
+        }
+        return null;
+    }
+
+    @Override
+    protected String getAction() {
+        return "Registering...";
+    }
+
+    @Override
+    protected void run(String alias, String password, AuthenticationObserver observer) {
+        userService.registerTask(firstName, lastName, alias, password, imageStringToUpload, observer);
+
+    }
+
+    public void setRegistrationInfo(String firstName, String lastName, String imageStringToUpload){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.imageStringToUpload = imageStringToUpload;
+    }
+
+
 }

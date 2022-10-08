@@ -23,6 +23,7 @@ import java.util.Base64;
 
 import edu.byu.cs.client.R;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.presenter.AuthenticationPresenter;
 import edu.byu.cs.tweeter.client.presenter.RegisterPresenter;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -30,7 +31,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 /**
  * Implements the register screen.
  */
-public class RegisterFragment extends Fragment implements RegisterPresenter.View {
+public class RegisterFragment extends Fragment implements AuthenticationPresenter.AuthenticationView {
     private static final String LOG_TAG = "RegisterFragment";
     private static final int RESULT_IMAGE = 10;
     private RegisterPresenter presenter;
@@ -81,23 +82,16 @@ public class RegisterFragment extends Fragment implements RegisterPresenter.View
             public void onClick(View view) {
                 // Register and move to MainActivity.
                 try {
-//                    validateRegistration(presenter);
-                    //validateRegistration();
                     String imageBytesBase64 = imageToByteArray();
-                    presenter.validateRegistration(firstName.getText().toString(), lastName.getText().toString(),
-                            alias.getText().toString(), password.getText().toString(), imageBytesBase64);
+                    presenter.setRegistrationInfo(firstName.getText().toString(), lastName.getText().toString(),
+                            imageBytesBase64);
+                    presenter.validateUser(alias.getText().toString(), password.getText().toString());
                     errorView.setText(null);
                     registeringToast = Toast.makeText(getContext(), "Registering...", Toast.LENGTH_LONG);
                     registeringToast.show();
 
                     // Send register request.
-                    presenter.registerTask(firstName.getText().toString(), lastName.getText().toString(),
-                            alias.getText().toString(), password.getText().toString(), imageBytesBase64);
-//                    RegisterTask registerTask = new RegisterTask(firstName.getText().toString(), lastName.getText().toString(),
-//                            alias.getText().toString(), password.getText().toString(), imageBytesBase64, new RegisterHandler());
-//
-//                    ExecutorService executor = Executors.newSingleThreadExecutor();
-//                    executor.execute(registerTask);
+                    presenter.authenticate(alias.getText().toString(), password.getText().toString());
                 } catch (Exception e) {
                     errorView.setText(e.getMessage());
                 }
@@ -119,8 +113,6 @@ public class RegisterFragment extends Fragment implements RegisterPresenter.View
         }
     }
 
-//    public void validateRegistration() {
-//    }
 
     private String imageToByteArray() {
         // Convert image to byte array.
@@ -142,7 +134,25 @@ public class RegisterFragment extends Fragment implements RegisterPresenter.View
     }
 
     @Override
-    public void handleRegister(User registeredUser) {
+    public void displayErrorMessage(String message) {
+        errorView.setText(message);
+    }
+
+    @Override
+    public void clearErrorMessage() {
+        errorView.setText("");
+    }
+
+    @Override
+    public void clearInfoMessage() {
+        if (registeringToast != null) {
+            registeringToast.cancel();
+            registeringToast = null;
+        }
+    }
+
+    @Override
+    public void navigateToUser(User registeredUser) {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.putExtra(MainActivity.CURRENT_USER_KEY, registeredUser);
 
