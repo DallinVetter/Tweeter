@@ -12,7 +12,7 @@ public class StoryPresenter extends PagedPresenter<Status> {
 
     @Override
     protected void getItems(AuthToken authToken, User user, int pageSize, Status lastItem, GetItemsObserver getItemsObserver) {
-        statusService.loadMoreItems(authToken, user, pageSize, lastItem, getItemsObserver);
+        statusService.loadStory(authToken, user, pageSize, lastItem, getItemsObserver);
     }
 
     @Override

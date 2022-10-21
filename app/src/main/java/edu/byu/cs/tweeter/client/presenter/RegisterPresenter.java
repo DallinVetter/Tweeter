@@ -1,11 +1,6 @@
 package edu.byu.cs.tweeter.client.presenter;
 
-import android.widget.ImageView;
-
 import edu.byu.cs.tweeter.client.backgroundTask.observer.AuthenticationObserver;
-import edu.byu.cs.tweeter.client.model.service.UserService;
-import edu.byu.cs.tweeter.model.domain.AuthToken;
-import edu.byu.cs.tweeter.model.domain.User;
 
 public class RegisterPresenter extends AuthenticationPresenter {
     AuthenticationView view;
@@ -20,10 +15,9 @@ public class RegisterPresenter extends AuthenticationPresenter {
 
     @Override
     protected String getDescription(boolean errOrEx) {
-        if(errOrEx){
+        if (errOrEx) {
             return "Failed to register: ";
-        }
-        else{
+        } else {
             return "Failed to get register because of exception: ";
         }
     }
@@ -66,7 +60,7 @@ public class RegisterPresenter extends AuthenticationPresenter {
 
     }
 
-    public void setRegistrationInfo(String firstName, String lastName, String imageStringToUpload){
+    public void setRegistrationInfo(String firstName, String lastName, String imageStringToUpload) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.imageStringToUpload = imageStringToUpload;

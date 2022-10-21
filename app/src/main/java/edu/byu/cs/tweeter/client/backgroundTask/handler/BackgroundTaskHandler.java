@@ -1,7 +1,5 @@
 package edu.byu.cs.tweeter.client.backgroundTask.handler;
 
-//import java.util.logging.Handler;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,8 +10,8 @@ import androidx.annotation.NonNull;
 import edu.byu.cs.tweeter.client.backgroundTask.BackgroundTask;
 import edu.byu.cs.tweeter.client.backgroundTask.observer.ServiceObserver;
 
-public abstract class BackgroundTaskHandler <T extends ServiceObserver> extends Handler {
-    private T observer;
+public abstract class BackgroundTaskHandler<T extends ServiceObserver> extends Handler {
+    private final T observer;
 
     public BackgroundTaskHandler(T observer) {
         super(Looper.getMainLooper());

@@ -24,7 +24,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public class FollowService {
-    private BackgroundTaskUtils backgroundTaskUtils;
+    private final BackgroundTaskUtils backgroundTaskUtils;
 
     public FollowService() {
         backgroundTaskUtils = new BackgroundTaskUtils();
@@ -33,24 +33,24 @@ public class FollowService {
     public void loadMoreFollowees(AuthToken currUserAuthToken, User user, int pageSize, User lastFollowee, GetItemsObserver<User> getItemsObserver) {
         GetFollowingTask getFollowingTask = new GetFollowingTask(currUserAuthToken,
                 user, pageSize, lastFollowee, new GetItemsHandler<User>(getItemsObserver));
-        backgroundTaskUtils.runTask(getFollowingTask);
+        BackgroundTaskUtils.runTask(getFollowingTask);
     }
 
     public void loadMoreFollowers(AuthToken currUserAuthToken, User user, int pageSize, User lastFollower, GetItemsObserver<User> getItemsObserver) {
         GetFollowersTask getFollowersTask = new GetFollowersTask(currUserAuthToken, user, pageSize, lastFollower, new GetItemsHandler<User>(getItemsObserver));
-        backgroundTaskUtils.runTask(getFollowersTask);
+        BackgroundTaskUtils.runTask(getFollowersTask);
     }
 
     public void unfollow(AuthToken currUserAuthToken, User user, SimpleNotificationObserver unfollowObserver) {
         UnfollowTask unfollowTask = new UnfollowTask(currUserAuthToken,
                 user, new SimpleNotificationHandler(unfollowObserver));
-        backgroundTaskUtils.runTask(unfollowTask);
+        BackgroundTaskUtils.runTask(unfollowTask);
     }
 
     public void follow(AuthToken currUserAuthToken, User user, SimpleNotificationObserver followObserver) {
         FollowTask followTask = new FollowTask(currUserAuthToken,
                 user, new SimpleNotificationHandler(followObserver));
-        backgroundTaskUtils.runTask(followTask);
+        BackgroundTaskUtils.runTask(followTask);
     }
 
     public void updateSelectedUserFollowingAndFollowers(AuthToken currUserAuthToken, User user, GetCountObserver followerCountObserver, GetCountObserver followingCountObserver) {
@@ -70,6 +70,6 @@ public class FollowService {
     public void isFollower(AuthToken currUserAuthToken, User currUser, User user, IsFollowerObserver isFollowerObserver) {
         IsFollowerTask isFollowerTask = new IsFollowerTask(currUserAuthToken,
                 currUser, user, new IsFollowerHandler(isFollowerObserver));
-        backgroundTaskUtils.runTask(isFollowerTask);
+        BackgroundTaskUtils.runTask(isFollowerTask);
     }
 }

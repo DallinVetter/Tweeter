@@ -10,12 +10,10 @@ import java.io.IOException;
 import edu.byu.cs.tweeter.util.FakeData;
 
 public abstract class BackgroundTask implements Runnable {
-    private static final String LOG_TAG = "BackgroundTask";
-
     public static final String SUCCESS_KEY = "success";
     public static final String MESSAGE_KEY = "message";
     public static final String EXCEPTION_KEY = "exception";
-
+    private static final String LOG_TAG = "BackgroundTask";
     /**
      * Message handler that will receive task results.
      */
@@ -43,7 +41,7 @@ public abstract class BackgroundTask implements Runnable {
 
     /**
      * Called by a Task's runTask method when it is successful.
-     *
+     * <p>
      * This method is public to make it accessible to test cases
      */
     public void sendSuccessMessage() {
@@ -55,7 +53,7 @@ public abstract class BackgroundTask implements Runnable {
 
     /**
      * Called by a Task's runTask method when it is not successful.
-     *
+     * <p>
      * This method is public to make it accessible to test cases
      */
     public void sendFailedMessage(String errorMessage) {
@@ -67,7 +65,7 @@ public abstract class BackgroundTask implements Runnable {
 
     /**
      * Called by a Task's runTask method when an exception occurs.
-     *
+     * <p>
      * This method is public to make it accessible to test cases
      */
     public void sendExceptionMessage(Exception exception) {
@@ -79,6 +77,7 @@ public abstract class BackgroundTask implements Runnable {
 
     /**
      * Add additional information during a successful task to a Bundle
+     *
      * @param msgBundle The bundle send to the handler with the results of the task
      */
     protected void loadSuccessBundle(Bundle msgBundle) {

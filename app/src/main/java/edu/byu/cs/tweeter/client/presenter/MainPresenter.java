@@ -19,43 +19,30 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 public class MainPresenter {
 
+    private static final String LOG_TAG = "MainActivity";
     private final MainView view;
     private final FollowService followService;
-    private final StatusService statusService;
     private final UserService userService;
+    private StatusService statusService;
     private User user;
 
-    private static final String LOG_TAG = "MainActivity";
-
-
-    public interface MainView {
-        void displayMessage(String message);
-
-        void setFollowersCount(int count);
-
-        void setFollowingCount(int count);
-
-        void setFollowButton(boolean isFollower);
-
-        void enableFollowButton(boolean status);
-
-        void updateFollowButton(boolean removed);
-
-        void showPostingToast(boolean toastStatus);
-
-        void logoutUser();
-    }
 
     public MainPresenter(MainView view) {
         this.view = view;
         followService = new FollowService();
-        statusService = new StatusService();
         userService = new UserService();
+    }
+
+    protected StatusService getStatusService() {
+        if (statusService == null) {
+            statusService = new StatusService();
+        }
+        return statusService;
     }
 
     public void statusPost(String post) {
         try {
-            statusService.postStatus(Cache.getInstance().getCurrUserAuthToken(), Cache.getInstance().getCurrUser(),
+            getStatusService().postStatus(Cache.getInstance().getCurrUserAuthToken(), Cache.getInstance().getCurrUser(),
                     post, getFormattedDateTime(), parseURLs(post), parseMentions(post), new PostStatusObserver());
         } catch (Exception ex) {
             Log.e(LOG_TAG, ex.getMessage(), ex);
@@ -66,8 +53,6 @@ public class MainPresenter {
     public void logoutUser() {
         userService.logout(Cache.getInstance().getCurrUserAuthToken(), new LogoutObserver());
     }
-
-
 
     public void unfollow(User user) {
         this.user = user;
@@ -159,7 +144,25 @@ public class MainPresenter {
 
     }
 
-    private abstract class ParentCountObserver implements GetCountObserver{
+    public interface MainView {
+        void displayMessage(String message);
+
+        void setFollowersCount(int count);
+
+        void setFollowingCount(int count);
+
+        void setFollowButton(boolean isFollower);
+
+        void enableFollowButton(boolean status);
+
+        void updateFollowButton(boolean removed);
+
+        void showPostingToast(boolean toastStatus);
+
+        void logoutUser();
+    }
+
+    private abstract class ParentCountObserver implements GetCountObserver {
 
         @Override
         public void handleSuccess(int count) {
@@ -175,7 +178,9 @@ public class MainPresenter {
         public void handleException(Exception ex) {
             view.displayMessage("Failed to get " + getObserverName() + " because of exception: " + ex.getMessage());
         }
+
         public abstract void handleCountSuccess(int count);
+
         protected abstract String getObserverName();
     }
 
@@ -220,6 +225,7 @@ public class MainPresenter {
         }
 
         public abstract void handleSimpleSuccess();
+
         protected abstract String getObserverName();
     }
 
@@ -235,6 +241,7 @@ public class MainPresenter {
             return "logout";
         }
     }
+
     private class PostStatusObserver extends ParentSimpleNotificationObserver {
 
         @Override
@@ -242,6 +249,7 @@ public class MainPresenter {
             view.showPostingToast(false);
             view.displayMessage("Successfully Posted!");
         }
+
         @Override
         protected String getObserverName() {
             return "post status";
@@ -255,6 +263,7 @@ public class MainPresenter {
             view.updateFollowButton(false);
             view.enableFollowButton(true);
         }
+
         @Override
         protected String getObserverName() {
             return "follow";
@@ -268,6 +277,7 @@ public class MainPresenter {
             view.updateFollowButton(true);
             view.enableFollowButton(true);
         }
+
         @Override
         protected String getObserverName() {
             return "unfollow";

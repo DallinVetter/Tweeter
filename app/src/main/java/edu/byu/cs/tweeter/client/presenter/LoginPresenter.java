@@ -12,10 +12,9 @@ public class LoginPresenter extends AuthenticationPresenter {
 
     @Override
     protected String getDescription(boolean errOrEx) {
-        if(errOrEx){
+        if (errOrEx) {
             return "Failed to login: ";
-        }
-        else{
+        } else {
             return "Failed to get login because of exception: ";
         }
     }

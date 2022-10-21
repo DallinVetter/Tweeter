@@ -12,25 +12,15 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 public abstract class PagedPresenter<T> extends ParentPresenter {
     protected static final int PAGE_SIZE = 10;
+    private final PagedView<T> view;
     protected User targetUser;
     protected AuthToken authToken;
     protected T lastItem;
     protected boolean hasMorePages;
     protected boolean isLoading;
-//    protected boolean isGettingUser;
-    private final PagedView<T> view;
     protected UserService userService;
     protected StatusService statusService;
     protected FollowService followService;
-
-    public interface PagedView<T> extends View {
-        // duplicate page view code
-        void setLoadingFooter(boolean footerStatus);
-
-        void displayUser(User user);
-
-        void addItems(List<T> items);
-    }
 
     public PagedPresenter(PagedView<T> view) {
         this.view = view;
@@ -38,6 +28,10 @@ public abstract class PagedPresenter<T> extends ParentPresenter {
         this.statusService = new StatusService();
         this.followService = new FollowService();
     }
+
+    protected abstract void getItems(AuthToken authToken, User user, int pageSize, T lastItem, GetItemsObserver getItemsObserver);
+
+    protected abstract String getDescription(boolean errorOrException);
 
     public void loadMoreItems(User targetUser) {
         isLoading = true;
@@ -61,9 +55,14 @@ public abstract class PagedPresenter<T> extends ParentPresenter {
         this.hasMorePages = hasMorePages;
     }
 
-    protected abstract void getItems(AuthToken authToken, User user, int pageSize, T lastItem, GetItemsObserver getItemsObserver);
+    public interface PagedView<T> extends View {
+        // duplicate page view code
+        void setLoadingFooter(boolean footerStatus);
 
-    protected abstract String getDescription(boolean errorOrException);
+        void displayUser(User user);
+
+        void addItems(List<T> items);
+    }
 
     protected class GetItemsObserver implements edu.byu.cs.tweeter.client.backgroundTask.observer.GetItemsObserver<T> {
         @Override

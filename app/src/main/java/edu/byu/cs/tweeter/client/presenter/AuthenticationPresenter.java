@@ -15,13 +15,6 @@ public abstract class AuthenticationPresenter extends ParentPresenter {
         userService = new UserService();
     }
 
-    public interface AuthenticationView extends View {
-        void displayErrorMessage(String message);
-        void clearErrorMessage();
-        void clearInfoMessage();
-        void navigateToUser(User user);
-    }
-
     protected abstract String getDescription(boolean errOrEx);
 
     protected abstract String validateUser(String alias, String password);
@@ -30,17 +23,27 @@ public abstract class AuthenticationPresenter extends ParentPresenter {
 
     protected abstract void run(String alias, String password, AuthenticationObserver observer);
 
-    public void authenticate(String alias, String password){
+    public void authenticate(String alias, String password) {
         String errorMessage = validateUser(alias, password);
-        if(errorMessage == null){
+        if (errorMessage == null) {
             view.displayMessage(getAction());
             run(alias, password, new ValidateUserObserver());
-        }else{
+        } else {
             view.displayErrorMessage(errorMessage);
         }
     }
 
-    protected class ValidateUserObserver implements AuthenticationObserver{
+    public interface AuthenticationView extends View {
+        void displayErrorMessage(String message);
+
+        void clearErrorMessage();
+
+        void clearInfoMessage();
+
+        void navigateToUser(User user);
+    }
+
+    protected class ValidateUserObserver implements AuthenticationObserver {
 
         @Override
         public void handleSuccess(User user, AuthToken authToken) {
